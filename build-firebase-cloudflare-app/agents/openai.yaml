@@ -1,0 +1,4 @@
+interface:
+  display_name: "Classroom Firebase × Cloudflare Builder"
+  short_description: "把班級點子直接做成可登入、可分享的上線網站，不必操作終端機"
+  default_prompt: "Use $build-firebase-cloudflare-app to turn my classroom idea into a working published app. Use simple language, handle setup for me, and let me sign in through official browser pages without terminal steps."
