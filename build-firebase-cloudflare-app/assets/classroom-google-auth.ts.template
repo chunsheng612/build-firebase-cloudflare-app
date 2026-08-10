@@ -1,0 +1,44 @@
+import {
+  GoogleAuthProvider,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { firebaseApp } from "./firebase";
+
+export const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+
+export function observeUser(callback: Parameters<typeof onAuthStateChanged>[1]) {
+  return onAuthStateChanged(auth, callback);
+}
+
+export async function signInToClass() {
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+    if (code === "auth/popup-blocked") {
+      throw new Error("登入視窗被瀏覽器擋住了，請允許彈出式視窗後再試一次。", { cause: error });
+    }
+    if (code === "auth/popup-closed-by-user") {
+      throw new Error("登入尚未完成，請再試一次。", { cause: error });
+    }
+    if (code === "auth/unauthorized-domain") {
+      throw new Error("這個網站網址還沒加入登入允許清單，我會先完成設定再請你重試。", { cause: error });
+    }
+    if (code === "auth/operation-not-allowed") {
+      throw new Error("Google 登入還沒啟用，我會先完成設定再請你重試。", { cause: error });
+    }
+    if (code === "auth/network-request-failed") {
+      throw new Error("目前無法連上登入服務，請確認網路後再試一次。", { cause: error });
+    }
+    throw error;
+  }
+}
+
+export function signOutOfClass() {
+  return signOut(auth);
+}
